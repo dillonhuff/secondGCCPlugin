@@ -1,11 +1,5 @@
 #include "div-zero-check.h"
 
-bool
-check_for_div_by_zero_gate()
-{
-  return true;
-}
-
 unsigned int
 rhs_is_a_divide(gimple asg)
 {
@@ -53,7 +47,7 @@ unsigned int check_for_div_by_zero(function* fun) {
   gimple stmt;
   gimple_stmt_iterator gsi;
 
-  FOR_EACH_BB(bb) {
+  FOR_EACH_BB_FN(bb, fun) {
     for (gsi = gsi_start_bb(bb); !gsi_end_p(gsi); gsi_next(&gsi)) {
       stmt = gsi_stmt(gsi);
       check_flagrant_div_by_zero(stmt);

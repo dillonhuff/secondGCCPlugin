@@ -14,16 +14,6 @@ extern "C"
 unsigned int
 check_for_div_by_zero_execute()
 {
-  /*  basic_block bb;
-  gimple stmt;
-  gimple_stmt_iterator gsi;
-
-  FOR_EACH_BB(bb) {
-    for (gsi = gsi_start_bb(bb); !gsi_end_p(gsi); gsi_next(&gsi)) {
-      stmt = gsi_stmt(gsi);
-      check_flagrant_div_by_zero(stmt);
-    }
-    }*/
   check_for_div_by_zero(cfun);
   return 0;
 }
