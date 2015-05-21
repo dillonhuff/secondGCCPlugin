@@ -1,5 +1,7 @@
 #include "div-zero-check.h"
 
+#include "gimple-pretty-print.h"
+
 unsigned int
 rhs_is_a_divide(gimple asg)
 {
@@ -9,6 +11,7 @@ rhs_is_a_divide(gimple asg)
   case(FLOOR_DIV_EXPR):
   case(CEIL_DIV_EXPR):
   case(ROUND_DIV_EXPR):
+  case(RDIV_EXPR):
     return 1;
   default:
     return 0;
@@ -42,6 +45,27 @@ check_flagrant_div_by_zero(gimple stmt)
   return 0;
 }
 
+unsigned int
+rhs_is_unmodified_function_parameter(gimple asg) {
+  tree denominator = gimple_assign_rhs2(asg);
+  if (TREE_CODE(denominator) == SSA_NAME) {
+    gimple def_statement = SSA_NAME_DEF_STMT(denominator);
+    if (gimple_code(def_statement) == GIMPLE_NOP) {
+      warning_at(gimple_location(asg), 0, "Divide by 0 function parameter");
+    }
+  }
+  return 0;
+}
+
+unsigned int
+check_div_by_unmodified_function_argument(gimple stmt) {
+  if (gimple_code(stmt) == GIMPLE_ASSIGN) {
+    gimple asg = stmt;
+    return rhs_is_a_divide(asg) && rhs_is_unmodified_function_parameter(asg);
+  }
+  return 0;
+}
+
 unsigned int check_for_div_by_zero(function* fun) {
   basic_block bb;
   gimple stmt;
@@ -51,6 +75,7 @@ unsigned int check_for_div_by_zero(function* fun) {
     for (gsi = gsi_start_bb(bb); !gsi_end_p(gsi); gsi_next(&gsi)) {
       stmt = gsi_stmt(gsi);
       check_flagrant_div_by_zero(stmt);
+      check_div_by_unmodified_function_argument(stmt);
     }
   }
   return 0;
