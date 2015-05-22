@@ -6,7 +6,7 @@
 #include "gimple.h"
 #include "diagnostic-core.h"
 
-
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -27,6 +27,8 @@ int stmt_contains_divide(gimple stmt);
 
 int find_all_divides_in_function(function* fun, vector<gimple>& divide_stmts);
 
-int find_all_null_tests_in_function(function* fun, vector<gimple>& null_tests);
+int find_all_null_tests_in_function(function* fun, vector<pair<gimple, tree> >& null_tests);
+
+int report_possible_null_ptrs(function* fun, vector<pair<gimple, tree> >& null_tests);
 
 #endif
