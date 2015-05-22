@@ -47,7 +47,7 @@ rhs_is_unmodified_function_parameter(gimple asg) {
   if (TREE_CODE(denominator) == SSA_NAME) {
     gimple def_statement = SSA_NAME_DEF_STMT(denominator);
     if (gimple_code(def_statement) == GIMPLE_NOP) {
-      warning_at(gimple_location(asg), 0, "Divide by 0 function parameter");
+      return 1; //warning_at(gimple_location(asg), 0, "Divide by 0 function parameter");
     }
   }
   return 0;

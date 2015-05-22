@@ -16,7 +16,7 @@ check_all_divides(vector<gimple> stmts,
       gimple stmt = *stit;
       div_zero_checker* checker = *it;
       if (checker->check(stmt)) {
-	warning_at(gimple_location(stmt), 0, "Potential divide by 0");
+	warning_at(gimple_location(stmt), 0, "Potential division by 0");
       }
     }
   }

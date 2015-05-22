@@ -1,5 +1,4 @@
 #include "flagrant-div-zero-checker.h"
-
 #include "syntax-utils.h"
 
 int
