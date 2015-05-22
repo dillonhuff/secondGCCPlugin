@@ -2,7 +2,7 @@
 
 using namespace std;
 
-unsigned int
+int
 rhs_is_a_divide(gimple asg) {
   tree_code operation_type = gimple_expr_code(asg);
   switch(operation_type) {
@@ -18,30 +18,30 @@ rhs_is_a_divide(gimple asg) {
   return 0;
 }
 
-unsigned int
+int
 denominator_of_divide_is_zero(gimple asg) {
   tree denominator = gimple_assign_rhs2(asg);
   return integer_zerop(denominator);
 }
 
-unsigned int
+int
 check_assign_for_div_by_zero(gimple asg) {
   if (rhs_is_a_divide(asg) &&
       denominator_of_divide_is_zero(asg)) {
-    warning_at(gimple_location(asg), 0, "Flagrant divide by 0");
+    return 1;
   }
   return 0;
 }
 
-unsigned int
+int
 check_flagrant_div_by_zero(gimple stmt) {
   if (gimple_code(stmt) == GIMPLE_ASSIGN) {
-    check_assign_for_div_by_zero(stmt);
+    return check_assign_for_div_by_zero(stmt);
   }
   return 0;
 }
 
-unsigned int
+int
 rhs_is_unmodified_function_parameter(gimple asg) {
   tree denominator = gimple_assign_rhs2(asg);
   if (TREE_CODE(denominator) == SSA_NAME) {
@@ -53,7 +53,7 @@ rhs_is_unmodified_function_parameter(gimple asg) {
   return 0;
 }
 
-unsigned int
+int
 check_div_by_unmodified_function_argument(gimple stmt) {
   if (gimple_code(stmt) == GIMPLE_ASSIGN) {
     gimple asg = stmt;
