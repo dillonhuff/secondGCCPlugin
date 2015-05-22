@@ -100,8 +100,8 @@ find_all_divides_in_function(function* fun, vector<gimple>& divide_stmts) {
 
 int
 is_ptr(tree t) {
-  printf("tree code is %s\n", tree_code_name[TREE_CODE(t)]);
-  return 1;
+  tree type = TREE_TYPE(t);
+  return TREE_CODE(type) == POINTER_TYPE;
 }
 
 int
