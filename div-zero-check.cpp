@@ -4,6 +4,7 @@
 #include "flagrant-div-zero-checker.h"
 #include "syntax-utils.h"
 
+#include <fstream>
 #include <vector>
 
 using namespace std;

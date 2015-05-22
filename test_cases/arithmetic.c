@@ -28,6 +28,10 @@ float float_div(double x, double y, double* m, int k, int p) {
   return x;
 }
 
+int no_divide_by_zero_is_possible(double m, double n, double p) {
+  
+}
+
 double strange(double x, double y) {
   if (x > 12 && y <= 19) {
     return x + 1;

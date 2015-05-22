@@ -1,5 +1,7 @@
 #include "syntax-utils.h"
 
+#include "tree-flow.h"
+
 using namespace std;
 
 int
@@ -53,11 +55,21 @@ rhs_is_unmodified_function_parameter(gimple asg) {
   return 0;
 }
 
+int denominator_is_used_exactly_once(gimple stmt) {
+  tree denominator = gimple_assign_rhs2(stmt);
+  if (TREE_CODE(denominator) == SSA_NAME) {
+    return has_single_use(denominator);
+  }
+  return 0;
+}
+
 int
-check_div_by_unmodified_function_argument(gimple stmt) {
+check_div_by_unmodified_function_argument_used_exactly_once(gimple stmt) {
   if (gimple_code(stmt) == GIMPLE_ASSIGN) {
     gimple asg = stmt;
-    return rhs_is_a_divide(asg) && rhs_is_unmodified_function_parameter(asg);
+    return rhs_is_a_divide(asg) &&
+      rhs_is_unmodified_function_parameter(asg) &&
+      denominator_is_used_exactly_once(asg);
   }
   return 0;
 }
@@ -86,3 +98,63 @@ find_all_divides_in_function(function* fun, vector<gimple>& divide_stmts) {
   }
 }
 
+int
+is_ptr(tree t) {
+  printf("tree code is %s\n", tree_code_name[TREE_CODE(t)]);
+  return 1;
+}
+
+int
+is_lhs_ptr_null_test(gimple cond) {
+  tree lhs = gimple_cond_lhs(cond);
+  tree rhs = gimple_cond_rhs(cond);
+  return is_ptr(lhs) && integer_zerop(rhs);
+}
+
+int
+is_rhs_ptr_null_test(gimple cond) {
+  tree lhs = gimple_cond_lhs(cond);
+  tree rhs = gimple_cond_rhs(cond);
+  return is_ptr(rhs) && integer_zerop(lhs);
+}
+
+int
+is_ptr_null_test(gimple cond) {
+  return is_lhs_ptr_null_test(cond) ||
+    is_rhs_ptr_null_test(cond);
+}
+
+int
+is_cond_null_test(gimple cond) {
+  switch(gimple_cond_code(cond)) {
+  case(NE_EXPR):
+  case(EQ_EXPR):
+    return is_ptr_null_test(cond);
+  default:
+    return 0;
+  }
+  return 0;
+}
+
+int
+is_null_test(gimple stmt) {
+  if (gimple_code(stmt) == GIMPLE_COND) {
+    return is_cond_null_test(stmt);
+  }
+  return 0;
+}
+
+int find_all_null_tests_in_function(function* fun, vector<gimple>& null_tests) {
+  basic_block bb;
+  gimple stmt;
+  gimple_stmt_iterator gsi;
+
+  FOR_EACH_BB_FN(bb, fun) {
+    for (gsi = gsi_start_bb(bb); !gsi_end_p(gsi); gsi_next(&gsi)) {
+      stmt = gsi_stmt(gsi);
+      if (is_null_test(stmt)) {
+	null_tests.push_back(stmt);
+      }
+    }
+  }
+}
